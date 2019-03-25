@@ -1,0 +1,35 @@
+---
+
+  - name: Add apt-key by id from Ubuntu keyserver
+    apt_key:
+      keyserver: "{{ key_server }}"
+      id: "{{ key_id }}"
+    register: apt_key
+
+  - block:
+    - name: Ensure apt uses https
+      apt:
+        name: apt-transport-https
+        state: latest
+        update_cache: true
+
+    - name: Instruct apt avoid downloading localizations
+      command: echo 'Acquire::Languages "none";' | tee /etc/apt/apt.conf.d/99disable-translations
+
+    - name: Add Cisofy repository
+      apt_repository:
+        repo: "{{ cisofy_repo_url }}"
+        state: present
+        update_cache: true
+      register: cisofy_repo
+
+    - name: Install Lynis via APT
+      apt:
+        name: lynis
+        state: latest
+        update_cache: true
+      register: lynis_installed
+      when: not cisofy_repo.failed
+
+    become: true
+    when: not apt_key.failed

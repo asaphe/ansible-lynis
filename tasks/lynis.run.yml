@@ -1,0 +1,11 @@
+---
+  - name: Stat Lynis
+    stat:
+      path: "{{ lynis_path }}"
+      follow: true
+    register: lynis_binary
+
+  - name: Run Lynis
+    shell: /tmp/lynis.sh
+    when: lynis_binary.stat.exists
+    become: true

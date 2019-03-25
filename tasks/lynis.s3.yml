@@ -1,0 +1,36 @@
+---
+  - block:
+    - name: Discover report file
+      find:
+        paths: "{{ lynis_reports_dir }}"
+        patterns: 'report-*'
+      register: lynis_report_file
+
+    - name: Fetch report files
+      fetch:
+        src: "{{ item.path }}"
+        dest: "{{ fetch_dir }}/{{ item.path }}"
+        flat: yes
+      with_items: "{{ lynis_report_file.files }}"
+
+    - name: Uploaded file to S3
+      aws_s3:
+        aws_access_key: "{{ aws_access_key_id }}"
+        aws_secret_key: "{{ aws_secret_access_key }}"
+        bucket: "{{ s3_bucket_name }}"
+        object: "/lynis-{{ env }}/{{ item.path.split('/')[-1] }}"
+        src: "{{ fetch_dir }}/{{ item.path }}"
+        mode: put
+        overwrite: never
+      register: lynis_report_uploaded
+      with_items: "{{ lynis_report_file.files }}"
+      when: not lynis_report_file.failed
+      delegate_to: localhost
+
+    - name: Clean local reports directory
+      file:
+        state: absent
+        path: "{{ item.path }}"
+      with_items: "{{ lynis_report_file.files }}"
+      when: lynis_report_uploaded.msg is match("All items completed")
+    become: true

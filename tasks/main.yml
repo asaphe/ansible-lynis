@@ -1,0 +1,13 @@
+---
+  - include: 'lynis.apt.yml'
+    when: install_lynis is not defined
+    tags: [lynis.apt]
+
+  - include: 'lynis.install.yml'
+    tags: [lynis.install]
+
+  - include: 'lynis.run.yml'
+    tags: [lynis.run]
+
+  - include: 'lynis.s3.yml'
+    tags: [lynis.s3]
