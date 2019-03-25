@@ -1,0 +1,22 @@
+---
+  - block:
+    - name: Install Lynis
+      apt:
+        name: lynis
+        state: latest
+        update_cache: true
+      register: lynis_installed
+      when: install_lynis is defined
+
+    - name: Create log directories
+      file:
+        path: "{{ lynis_log_dir }}"
+        state: directory
+
+    - name: Copy Lynis script
+      copy:
+       src: lynis.sh
+       dest: /tmp/lynis.sh
+       mode: 0555
+
+    become: true

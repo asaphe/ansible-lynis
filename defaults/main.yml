@@ -1,0 +1,12 @@
+---
+key_server: 'keyserver.ubuntu.com'
+key_id: 'C80E383C3DE9F082E01391A0366C67DE91CA5D5F'
+cisofy_repo_url: 'deb https://packages.cisofy.com/community/lynis/deb/ stable main'
+lynis_log_dir: '/var/log/lynis'
+lynis_reports_dir: '/var/log/lynis'
+lynis_path: '/usr/sbin/lynis'
+s3_bucket_name: "tilix-logs-{{ env }}"
+aws_access_key_id: "{{ lynis_aws_access_key }}"
+aws_secret_access_key: "{{ lynis_aws_secret_key }}"
+install_lynis: true
+fetch_dir: '/tmp/fetched'
